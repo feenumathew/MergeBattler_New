@@ -17,15 +17,15 @@ MonoBehaviour:
     objectToSpawn: {fileID: 6546302814618738758, guid: 0475db97e93c54baaa54b43d54f2ccc5,
       type: 3}
     cardImage: {fileID: 21300000, guid: f5c0f710de163483db7c745663f677aa, type: 3}
-  - cardId: 4
+  - cardId: 2
+    objectToSpawn: {fileID: 6546302814618738758, guid: d3c93ac7cbb8f40b6ad6b3f7612fa89a,
+      type: 3}
+    cardImage: {fileID: 21300000, guid: a33e3d4d3a4a64404b27696c6debdb4d, type: 3}
+  - cardId: 3
     objectToSpawn: {fileID: 6546302814618738758, guid: b3d6abf4b3a4a40eb8506fe50882e522,
       type: 3}
     cardImage: {fileID: 21300000, guid: 936c23552334c46c3821bfceda9ef8a3, type: 3}
   - cardId: 4
-    objectToSpawn: {fileID: 6546302814618738758, guid: d3c93ac7cbb8f40b6ad6b3f7612fa89a,
+    objectToSpawn: {fileID: 6546302814618738758, guid: b3d6abf4b3a4a40eb8506fe50882e522,
       type: 3}
-    cardImage: {fileID: 21300000, guid: a33e3d4d3a4a64404b27696c6debdb4d, type: 3}
-  - cardId: 4
-    objectToSpawn: {fileID: 6546302814618738758, guid: d3c93ac7cbb8f40b6ad6b3f7612fa89a,
-      type: 3}
-    cardImage: {fileID: 21300000, guid: a33e3d4d3a4a64404b27696c6debdb4d, type: 3}
+    cardImage: {fileID: 21300000, guid: 936c23552334c46c3821bfceda9ef8a3, type: 3}
