@@ -10,14 +10,12 @@ namespace TinyWar
         [SerializeField] private float playerHealth = 100;
         [SerializeField] private float playerAttackDamage = 10;
         [SerializeField] private Team teamType;
-
         private Animator animator;
         private CharacterController characterController;
         private PlayerAIController playerAIController;
         private PlayerUIManager playerUIManager;
         private float minAttackDistance = 1;
         private float updateLoopWaitTime = .2f;
-
         public string playerName;
         public Action<PlayerController,PlayerController> hitTaken;
         public Action<PlayerController,PlayerController> playerDied;
@@ -36,7 +34,6 @@ namespace TinyWar
             get { return teamType; }
             set { teamType = value; }
         }
-
 
         private void Awake()
         {
@@ -96,10 +93,8 @@ namespace TinyWar
                         hitTaken?.Invoke(this,attackingPlayerController);
                     }
                 }
-            }
-           
+            }           
         }
-
 
         private void SearchForEnemy()
         {
@@ -125,9 +120,7 @@ namespace TinyWar
                 if(nearestEnemyDist<minAttackDistance)
                 {
                     playerAIController.StopAgent();
-
                     StartFighting();
-
                 }
             }
         }
@@ -149,7 +142,6 @@ namespace TinyWar
             animator.SetTrigger("PlayerDead");
         }
 
-
         private void HitTakenHandler(PlayerController hitTakenPlayer,PlayerController hitDealtPlayer)
         {
             playerHealth -= playerAttackDamage;
@@ -157,8 +149,6 @@ namespace TinyWar
             if(playerHealth <= 0)
                 playerDied?.Invoke(hitTakenPlayer,hitDealtPlayer);
         }
-
-       
 
         private void PlayerDiedHandler(PlayerController diedPlayer,PlayerController killedPlayer)
         {
@@ -171,7 +161,6 @@ namespace TinyWar
             characterController.enabled = false;
             Destroy(gameObject, 5);
         }
-
 
         private void OnDisable()
         {

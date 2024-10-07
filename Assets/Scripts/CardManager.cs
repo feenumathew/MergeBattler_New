@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using TinyWar;
+using UnityEngine.EventSystems;
 
 public class CardManager : MonoBehaviour
 {
@@ -9,7 +10,11 @@ public class CardManager : MonoBehaviour
     public Transform cardContainer;         // Where cards will be instantiated in the UI
     public CardsData cardsData;             // Reference to the CardsData ScriptableObject
 
+    [SerializeField]
+    private List<CardsData.CardEntry> cardDeck = new List<CardsData.CardEntry>();
+
     private List<Card> cards = new List<Card>();
+
 
     void Start()
     {
@@ -19,12 +24,19 @@ public class CardManager : MonoBehaviour
     // Generates initial cards
     void GenerateCards()
     {
-        foreach (var cardEntry in cardsData.cardEntries)
+        for (int i = 0; i < cardDeck.Count; i++)
         {
-            GameObject newCard = Instantiate(cardPrefab, cardContainer);
-            Card cardComponent = newCard.GetComponent<Card>();
-            cardComponent.Setup(cardEntry, this); // Setup card using CardEntry data
-            cards.Add(cardComponent);
+            foreach (var cardEntry in cardsData.cardEntries)
+            {
+                if (cardEntry.cardId == cardDeck[i].cardId)
+                {
+                    cardDeck[i] = cardEntry;
+                    GameObject newCard = Instantiate(cardPrefab, cardContainer);
+                    Card cardComponent = newCard.GetComponent<Card>();
+                    cardComponent.Setup(cardEntry, this); // Setup card using CardEntry data
+                    cards.Add(cardComponent);
+                }
+            }
         }
     }
 
@@ -35,46 +47,93 @@ public class CardManager : MonoBehaviour
         RaycastHit hit;
 
         // Perform the raycast to detect hit
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out hit) && hit.transform.CompareTag("Platform"))
         {
+
             // Successful hit, spawn object at the hit point
-            GameObject spawnedObject = TinyWarManager.Instance.SpawnPlayerInGround(card.cardEntry.objectToSpawn);
+            GameObject spawnedObject = TinyWarManager.Instance.SpawnPlayerInGround(card.cardEntry.objectToSpawn, hit.point);
             card.gameObject.SetActive(false); // Disable the dragged card after spawning
-            CheckForMerge(card); // Check for card merge logic
+
         }
         else
         {
-            // If no valid hit, reset the card to its initial position
-            card.ReturnToInitialPosition();
-        }
-    }
+            Card cardUnderPointer = GetCardUnderPointer(card);
 
-    // Checks if two identical cards can merge
-    public void CheckForMerge(Card draggedCard)
-    {
-        foreach (var card in cards)
-        {
-            if (card.cardEntry.cardId == draggedCard.cardEntry.cardId && card != draggedCard && !card.isMerged)
+            if (cardUnderPointer != null && cardUnderPointer.cardEntry.cardId == card.cardEntry.cardId)
             {
-                card.isMerged = true;
-                draggedCard.isMerged = true;
+                // Merge logic if card IDs match
+                MergeCards(card, cardUnderPointer);
+            }
 
-                // Merge logic: create a new card or new object
-                CreateMergedCard(draggedCard.cardEntry);
-                return;
+            else
+            {
+                // Reset the card if no merge happens
+                card.ReturnToInitialPosition();
             }
         }
     }
 
-    // Creates a merged card
-    void CreateMergedCard(CardsData.CardEntry oldCardEntry)
-    {
-        int newCardId = Mathf.Min(oldCardEntry.cardId + 1, cardsData.cardEntries.Count - 1);
-        CardsData.CardEntry newCardEntry = cardsData.cardEntries[newCardId];
 
-        GameObject newCard = Instantiate(cardPrefab, cardContainer);
-        Card cardComponent = newCard.GetComponent<Card>();
-        cardComponent.Setup(newCardEntry, this);
-        cards.Add(cardComponent);
+
+    // Checks if the pointer is currently over a UI elemen
+
+    // Detects the card under the pointer using Raycast
+    private Card GetCardUnderPointer(Card card)
+    {
+        PointerEventData pointerEventData = new PointerEventData(EventSystem.current)
+        {
+            position = Input.mousePosition
+        };
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerEventData, results);
+
+        foreach (RaycastResult result in results)
+        {
+            Card cardHit = result.gameObject.GetComponent<Card>();
+
+            if (cardHit != null && cardHit != card)
+            {
+                return cardHit;
+            }
+        }
+
+        return null;
+    }
+
+    private void MergeCards(Card draggedCard, Card targetCard)
+    {
+        int targetCardsiblingIndex = cards.IndexOf(targetCard);
+        cards.Remove(draggedCard);
+        cards.Remove(targetCard);
+        cardDeck.Remove(draggedCard.cardEntry);
+        cardDeck.Remove(targetCard.cardEntry);
+
+        // Disable both cards and create a merged card
+        draggedCard.gameObject.SetActive(false);
+        targetCard.gameObject.SetActive(false);
+
+        CreateMergedCard(targetCard, targetCardsiblingIndex);
+    }
+
+    // Creates a new merged card
+    void CreateMergedCard(Card targetCard, int targetCardsiblingIndex)
+    {
+        int newCardId = targetCard.cardEntry.cardId * 10 + targetCard.cardEntry.cardId;
+
+        foreach (var cardEntry in cardsData.cardEntries)
+        {
+            if (cardEntry.cardId == newCardId)
+            {
+                cardDeck.Insert(targetCardsiblingIndex, cardEntry);
+                GameObject newCard = Instantiate(cardPrefab, cardContainer);
+                newCard.transform.SetSiblingIndex(targetCardsiblingIndex);
+                Card cardComponent = newCard.GetComponent<Card>();
+                cardComponent.Setup(cardEntry, this); // Setup card using CardEntry data
+                cards.Insert(targetCardsiblingIndex,cardComponent);
+            }
+        }
+        
+
     }
 }

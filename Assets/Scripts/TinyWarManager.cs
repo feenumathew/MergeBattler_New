@@ -69,40 +69,24 @@ namespace TinyWar
         public void SpawnEnemy()
         {
             GameObject enemyPrefab = Resources.Load<GameObject>("RedUnit");
-            SpawnEnemy(enemyPrefab,enemySpawnPoint.position);
+            SpawnPlayerInGround(enemyPrefab, enemySpawnPoint.position);
         }
 
-        public GameObject SpawnPlayerInGround(GameObject prefab)
+        public GameObject SpawnPlayerInGround(GameObject prefab, Vector3 position)
         {
-            RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity))
-            {
-                if (hit.transform.CompareTag("Platform"))
-                {
-                    foreach (Collider coll in Physics.OverlapSphere(hit.point, .3f))
-                        if (coll.transform.CompareTag("Player"))
-                            return null;
-                    PlayerController playerController = Instantiate(prefab, hit.point, Quaternion.identity).GetComponent<PlayerController>();
-                    activePlayers.Add(playerController);
-                    playerController.playerName = prefab.name + "_" + UnityEngine.Random.Range(1000, 10000);
-                    playerController.transform.name = playerController.playerName;
-                    playerController.playerDied += RemovePlayerFromActiveList;
-                    uIManager.EventOccured(playerController.TeamType, playerController.playerName, playerController.playerName + " spawn at point...");
-                    return playerController.gameObject;
-                }
-            }
-            return null;
-        }
-
-        public void SpawnEnemy(GameObject prefab, Vector3 position)
-        {
+            foreach (Collider coll in Physics.OverlapSphere(position, .3f))
+                if (coll.transform.CompareTag("Player"))
+                    return null;
             PlayerController playerController = Instantiate(prefab, position, Quaternion.identity).GetComponent<PlayerController>();
             activePlayers.Add(playerController);
             playerController.playerName = prefab.name + "_" + UnityEngine.Random.Range(1000, 10000);
             playerController.transform.name = playerController.playerName;
             playerController.playerDied += RemovePlayerFromActiveList;
             uIManager.EventOccured(playerController.TeamType, playerController.playerName, playerController.playerName + " spawn at point...");
+            return playerController.gameObject;
         }
+
+
 
         public Transform SpawnHealthBarForPlayer(string playerName)
         {

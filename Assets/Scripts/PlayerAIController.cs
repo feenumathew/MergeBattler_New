@@ -16,8 +16,6 @@ namespace TinyWar
 
         public Transform target;
 
-        public float stopDistance = .5f;
-
         private PlayerController playerController;
 
         private void OnEnable()

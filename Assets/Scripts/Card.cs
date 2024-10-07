@@ -24,6 +24,7 @@ public class Card : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
         cardManager = manager;
         canvasGroup = GetComponent<CanvasGroup>();
         cardImage = GetComponent<Image>();
+        gameObject.name = cardEntry.objectToSpawn.name;
         UpdateCardUI(); // Update appearance based on cardEntry
     }
 

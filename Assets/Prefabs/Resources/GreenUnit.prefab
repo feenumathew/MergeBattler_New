@@ -18,6 +18,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1521094320108335148, guid: 520f293c65e0046b48185d55fabd3d53,
+        type: 3}
+      propertyPath: stopDistance
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 2660662514167267106, guid: 520f293c65e0046b48185d55fabd3d53,
         type: 3}
       propertyPath: playerHealth
